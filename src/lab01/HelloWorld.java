@@ -1,9 +1,13 @@
-package comp3021;
+package lab01;
 
+/**
+ * HelloWorld
+ */
 public class HelloWorld {
 
     public static void main(String[] args) {
 
         System.out.println("Hello World! This is COMP3021 lab01!");
+
     }
 }
