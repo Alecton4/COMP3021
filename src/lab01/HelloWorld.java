@@ -2,6 +2,8 @@ package lab01;
 
 /**
  * HelloWorld
+ * @author Alex
+ * @version 1.1
  */
 public class HelloWorld {
 
