@@ -15,14 +15,14 @@ public class Folder {
      * @return the name
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
      * @return the notes
      */
     public ArrayList<Note> getNotes() {
-        return notes;
+        return this.notes;
     }
 
     public void addNote(Note newNote) {
@@ -40,7 +40,7 @@ public class Folder {
                 ++numText;
             }
         }
-        return name + ":" + numText + ":" + numImage;
+        return this.name + ":" + numText + ":" + numImage;
     }
 
     @Override
@@ -52,6 +52,6 @@ public class Folder {
     // @Override
     public boolean equals(Folder folder) {
         // TODO Auto-generated method stub
-        return name == folder.getName();
+        return this.name == folder.getName();
     }
 }

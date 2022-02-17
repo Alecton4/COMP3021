@@ -15,7 +15,7 @@ public class Note {
      * @return the title
      */
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
     @Override
@@ -25,8 +25,8 @@ public class Note {
     }
 
     // @Override
-    public boolean equals(Note obj) {
+    public boolean equals(Note note) {
         // TODO Auto-generated method stub
-        return title == obj.getTitle();
+        return this.title == note.getTitle();
     }
 }

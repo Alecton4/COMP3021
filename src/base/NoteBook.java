@@ -13,7 +13,7 @@ public class NoteBook {
      * @return the folders
      */
     public ArrayList<Folder> getFolders() {
-        return folders;
+        return this.folders;
     }
 
     public boolean createImageNote(String folderName, String title) {
@@ -27,7 +27,7 @@ public class NoteBook {
     }
 
     private boolean insertNote(String folderName, Note newNote) {
-        for (Folder folder : folders) {
+        for (Folder folder : this.folders) {
             if (folder.getName() == folderName) {
                 for (Note note : folder.getNotes()) {
                     if (note.equals(newNote)) {
@@ -42,7 +42,7 @@ public class NoteBook {
         }
         Folder newFolder = new Folder(folderName);
         newFolder.addNote(newNote);
-        folders.add(newFolder);
+        this.folders.add(newFolder);
         return true;
     }
 }
