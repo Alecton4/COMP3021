@@ -52,6 +52,6 @@ public class Folder {
     // @Override
     public boolean equals(Folder folder) {
         // TODO Auto-generated method stub
-        return this.name == folder.getName();
+        return folder.getName().equals(this.name);
     }
 }

@@ -1,6 +1,7 @@
 package base;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class Note {
     private String title;
@@ -27,6 +28,20 @@ public class Note {
     // @Override
     public boolean equals(Note note) {
         // TODO Auto-generated method stub
-        return this.title == note.getTitle();
+        return note.getTitle().equals(this.title);
     }
+
+    // @Override
+    // public boolean equals(Object obj) {
+    //     // TODO Auto-generated method stub
+    //     if (obj == this) {
+    //         return true;
+    //     }
+    //     if (!(obj instanceof Note)) {
+    //         return false;
+    //     }
+    //     Note note = (Note) obj;
+    //     return Objects.equals(note.title, this.title);
+    // }
+
 }

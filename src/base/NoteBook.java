@@ -28,7 +28,7 @@ public class NoteBook {
 
     private boolean insertNote(String folderName, Note newNote) {
         for (Folder folder : this.folders) {
-            if (folder.getName() == folderName) {
+            if (folderName.equals(folder.getName())) {
                 for (Note note : folder.getNotes()) {
                     if (note.equals(newNote)) {
                         System.out.println(
