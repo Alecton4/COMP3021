@@ -1,3 +1,3 @@
-# COMP3021 labs
+# COMP3021 assignments and labs
 
 ZHAO, Yijie (20583838)
