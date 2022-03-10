@@ -1,3 +1,5 @@
+package main.java;
+
 enum Status {
     Confirmed, Recovered
 }
@@ -11,7 +13,8 @@ public class Record {
     public Record(String p_IDCardNo, String p_symptomLevelStr, String p_statusStr) {
         this.IDCardNo = p_IDCardNo;
 
-        assert(p_symptomLevelStr.equals("Critical") || p_symptomLevelStr.equals("Moderate") || p_symptomLevelStr.equals("Mild"));
+        assert (p_symptomLevelStr.equals("Critical") || p_symptomLevelStr.equals("Moderate")
+                || p_symptomLevelStr.equals("Mild"));
         switch (p_symptomLevelStr) {
             case "Critical":
                 this.symptomLevel = SymptomLevel.Critical;
@@ -26,8 +29,8 @@ public class Record {
                 break;
         }
 
-        assert(p_statusStr.equals("Confirmed") || p_statusStr.equals("Recovered"));
-        switch(p_statusStr) {
+        assert (p_statusStr.equals("Confirmed") || p_statusStr.equals("Recovered"));
+        switch (p_statusStr) {
             case "Confirmed":
                 this.status = Status.Confirmed;
                 break;

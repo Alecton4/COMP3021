@@ -1,7 +1,8 @@
+package main.java;
+
 import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
-
 
 public class QuarantineSystem {
     public static class DashBoard {
@@ -31,11 +32,10 @@ public class QuarantineSystem {
 
             /*
              * TODO: Collect the statistics based on People
-             *  Add the data in the lists, such as patientNums, infectNums, etc.
+             * Add the data in the lists, such as patientNums, infectNums, etc.
              */
         }
     }
-
 
     private List<Person> People;
     private List<Patient> Patients;
@@ -77,14 +77,14 @@ public class QuarantineSystem {
      * Save a single patient when the status of the record is Confirmed
      */
     public void saveSinglePatient(Record record) {
-        //TODO
+        // TODO
     }
 
     /*
      * Release a single patient when the status of the record is Recovered
      */
     public void releaseSinglePatient(Record record) {
-        //TODO
+        // TODO
     }
 
     /*
@@ -140,11 +140,11 @@ public class QuarantineSystem {
             lineNum++;
             if (lineNum > 1) {
                 String[] records = line.split("        ");
-                assert(records.length == 3);
+                assert (records.length == 3);
                 String pIDCardNo = records[0];
                 System.out.println(pIDCardNo);
-                assert(records[1].equals("Critical") || records[1].equals("Moderate") || records[1].equals("Mild"));
-                assert(records[2].equals("Confirmed") || records[2].equals("Recovered"));
+                assert (records[1].equals("Critical") || records[1].equals("Moderate") || records[1].equals("Mild"));
+                assert (records[2].equals("Confirmed") || records[2].equals("Recovered"));
                 Record r = new Record(pIDCardNo, records[1], records[2]);
                 Records.add(r);
             }
@@ -171,7 +171,7 @@ public class QuarantineSystem {
             lineNum++;
             if (lineNum > 1) {
                 String[] records = line.split("        ");
-                assert(records.length == 6);
+                assert (records.length == 6);
                 String pHospitalID = records[0];
                 System.out.println(pHospitalID);
                 int XLoc = Integer.parseInt(records[1]);
@@ -200,7 +200,7 @@ public class QuarantineSystem {
         BufferedWriter bw = new BufferedWriter(writer);
         bw.write("IDCardNo        SymptomLevel        Status        HospitalID\n");
         for (Record record : Records) {
-            //Invoke the toString method of Record.
+            // Invoke the toString method of Record.
             bw.write(record.toString() + "\n");
         }
         bw.close();
@@ -237,7 +237,8 @@ public class QuarantineSystem {
             String vacNumsStr = String.valueOf(dashBoard.vacNums.get(i));
             String vacInfectNumsStr = String.valueOf(dashBoard.vacInfectNums.get(i));
 
-            bw.write(ageRageStr + "        " + patientNumStr + "        " + infectAvgNumsStr + "        " + vacNumsStr + "        " + vacInfectNumsStr + "\n");
+            bw.write(ageRageStr + "        " + patientNumStr + "        " + infectAvgNumsStr + "        " + vacNumsStr
+                    + "        " + vacInfectNumsStr + "\n");
         }
 
         bw.close();
