@@ -1,19 +1,17 @@
-package main.java;
-
 enum SymptomLevel {
     Critical, Moderate, Mild
 }
 
-public class Patient extends Person {
+public class Patient extends Person{
     private SymptomLevel symptomLevel;
     private String HospitalID;
 
     /*
-     * Class Constructors
-     * Remember to initialize the attributes in the Person
-     */
+    * Class Constructors
+    * Remember to initialize the attributes in the Person
+    */
     public Patient(Person p, SymptomLevel p_symptomLevel) {
-        // TODO
+        //TODO
     }
 
     public void setSymptomLevel(SymptomLevel p_symptomLevel) {

@@ -1,5 +1,3 @@
-package main.java;
-
 public class Capacity {
     public int CriticalCapacity;
     public int ModerateCapacity;

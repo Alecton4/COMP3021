@@ -1,5 +1,3 @@
-package main.java;
-
 import java.util.List;
 import java.util.ArrayList;
 
@@ -51,14 +49,14 @@ public class Hospital {
             case Mild:
                 return this.MildPatients;
         }
-        // unreachable code
+        //unreachable code
         return null;
     }
 
     /* Add a patient to the corresponding patient list */
     public boolean addPatient(Patient patient) {
         switch (patient.getSymptomLevel()) {
-            // TODO: handle three kinds of the symptom levels
+            //TODO: handle three kinds of the symptom levels
             default:
                 break;
         }
@@ -68,7 +66,7 @@ public class Hospital {
     /* Remove a patient from the corresponding patient list */
     public boolean releasePatient(Patient patient) {
         switch (patient.getSymptomLevel()) {
-            // TODO: handle three kinds of the symptom levels
+            //TODO: handle three kinds of the symptom levels
             default:
                 break;
         }
