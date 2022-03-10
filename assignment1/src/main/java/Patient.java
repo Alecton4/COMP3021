@@ -14,6 +14,8 @@ public class Patient extends Person {
      */
     public Patient(Person p, SymptomLevel p_symptomLevel) {
         // TODO
+        super(p.getIDCardNo(), p.getLoc(), p.getGender(), p.getAge(), p.getIsVac());
+        this.setSymptomLevel(p_symptomLevel);
     }
 
     public void setSymptomLevel(SymptomLevel p_symptomLevel) {
