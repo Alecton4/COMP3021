@@ -23,75 +23,77 @@ public class Folder implements Comparable<Folder> {
     }
 
     public List<Note> searchNotes(String keywords) {
-        // maintain collections of two kinds of keywords
-        String[] keywordsArr = keywords.split("\\s+");
-        Stack<String> wordsInAND = new Stack<String>();
-        Stack<String[]> pairsInOR = new Stack<String[]>();
-        String previousWordIntoOR = "";
-        boolean intoOR = false;
-        for (String str : keywordsArr) {
-            if (intoOR) {
-                String[] pair = { previousWordIntoOR, str };
-                pairsInOR.push(pair);
-                intoOR = false;
+        // maintain collections of two kinds of targets
+        // !!!can NOT handle consecutive ORs
+        String[] wordArr = keywords.split("\\s+");
+        Stack<String> targetsOfAND = new Stack<String>();
+        Stack<String[]> targetPairsOfOR = new Stack<String[]>();
+        String previousTargetOfOR = "";
+        boolean ofOR = false;
+        for (String word : wordArr) {
+            if (ofOR) {
+                String[] targetPair = { previousTargetOfOR, word };
+                targetPairsOfOR.push(targetPair);
+                ofOR = false;
             } else {
-                if (StringHelper.containsIgnoreCase(str, "or")) {
-                    previousWordIntoOR = wordsInAND.pop();
-                    intoOR = true;
+                if (StringHelper.containsIgnoreCase(word, "or")) {
+                    previousTargetOfOR = targetsOfAND.pop();
+                    ofOR = true;
                 } else {
-                    wordsInAND.push(str);
+                    targetsOfAND.push(word);
                 }
             }
         }
 
+        // search for notes containing targets
         List<Note> result = new ArrayList<Note>();
         for (Note note : this.notes) {
             boolean isResult = true;
             if (note instanceof TextNote) {
                 TextNote textNote = (TextNote) note;
-                // check AND words
-                for (String target : wordsInAND) {
+                // search for AND targets
+                for (String target : targetsOfAND) {
                     if (!textNote.containsKeyword(target)) {
                         isResult = false;
                         break;
                     }
                 }
-                // skip checking current note and start checking the next note
+                // skip the current note and start checking the next note
                 if (!isResult) {
                     continue;
                 }
-                // check OR words
-                for (String[] pair : pairsInOR) {
-                    if (!(textNote.containsKeyword(pair[0]) || textNote.containsKeyword(pair[1]))) {
+                // search for OR targets
+                for (String[] targetPair : targetPairsOfOR) {
+                    if (!(textNote.containsKeyword(targetPair[0]) || textNote.containsKeyword(targetPair[1]))) {
                         isResult = false;
                         break;
                     }
                 }
-                // skip checking current note and start checking the next note
+                // skip the current note and start checking the next note
                 if (!isResult) {
                     continue;
                 }
             } else if (note instanceof ImageNote) {
                 ImageNote imgNote = (ImageNote) note;
-                // check AND words
-                for (String target : wordsInAND) {
+                // search for AND targets
+                for (String target : targetsOfAND) {
                     if (!imgNote.containsKeyword(target)) {
                         isResult = false;
                         break;
                     }
                 }
-                // skip checking current note and start checking the next note
+                // skip the current note and start checking the next note
                 if (!isResult) {
                     continue;
                 }
-                // check OR words
-                for (String[] pair : pairsInOR) {
-                    if (!(imgNote.containsKeyword(pair[0]) || imgNote.containsKeyword(pair[1]))) {
+                // search for OR targets
+                for (String[] targetPair : targetPairsOfOR) {
+                    if (!(imgNote.containsKeyword(targetPair[0]) || imgNote.containsKeyword(targetPair[1]))) {
                         isResult = false;
                         break;
                     }
                 }
-                // skip checking current note and start checking the next note
+                // skip the current note and start checking the next note
                 if (!isResult) {
                     continue;
                 }
