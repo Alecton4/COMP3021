@@ -13,4 +13,9 @@ public class ImageNote extends Note {
         super(title);
         this.image = image;
     }
+
+    @Override
+    public boolean containsKeyword(String target) {
+        return StringHelper.containsIgnoreCase(this.getTitle(), target);
+    }
 }

@@ -1,6 +1,8 @@
 package base;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class NoteBook {
     private ArrayList<Folder> folders;
@@ -9,21 +11,19 @@ public class NoteBook {
         this.folders = new ArrayList<Folder>();
     }
 
-    /**
-     * @return the folders
-     */
-    public ArrayList<Folder> getFolders() {
-        return this.folders;
-    }
-
     public boolean createImageNote(String folderName, String title) {
-        ImageNote imgNote = new ImageNote(title);
-        return insertNote(folderName, imgNote);
+        ImageNote newImgNote = new ImageNote(title);
+        return insertNote(folderName, newImgNote);
     }
 
     public boolean createTextNote(String folderName, String title) {
-        TextNote txtNote = new TextNote(title);
-        return insertNote(folderName, txtNote);
+        TextNote newTextNote = new TextNote(title);
+        return insertNote(folderName, newTextNote);
+    }
+
+    public boolean createTextNote(String folderName, String title, String content) {
+        TextNote newTextNote = new TextNote(title, content);
+        return insertNote(folderName, newTextNote);
     }
 
     private boolean insertNote(String folderName, Note newNote) {
@@ -45,4 +45,27 @@ public class NoteBook {
         this.folders.add(newFolder);
         return true;
     }
+
+    public List<Note> searchNotes(String keywords) {
+        List<Note> result = new ArrayList<Note>();
+        for (Folder folder : this.folders) {
+            result.addAll(folder.searchNotes(keywords));
+        }
+        return result;
+    }
+
+    public void sortFolders() {
+        for (Folder folder : this.folders) {
+            folder.sortNotes();
+        }
+        Collections.sort(this.folders);
+    }
+
+    /**
+     * @return the folders
+     */
+    public ArrayList<Folder> getFolders() {
+        return this.folders;
+    }
+
 }
