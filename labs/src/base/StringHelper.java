@@ -1,5 +1,6 @@
 package base;
 
+// REF:https://stackoverflow.com/questions/86780/how-to-check-if-a-string-contains-another-string-in-a-case-insensitive-manner-in/25379180#25379180
 public class StringHelper {
     public static boolean containsIgnoreCase(String source, String target) {
         final int SOURCE_LENGTH = source.length();
@@ -18,6 +19,7 @@ public class StringHelper {
                 continue;
             }
 
+            // Tests if two string regions are equal
             if (source.regionMatches(true, i, target, 0, TARGET_LENGTH)) {
                 return true;
             }
