@@ -1,14 +1,9 @@
 package base;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.util.HashMap;
-
-import javafx.scene.text.Text;
+import java.util.Scanner;
 
 public class TextNote extends Note {
     private String content;
@@ -52,16 +47,21 @@ public class TextNote extends Note {
         String content = "";
         File file = new File(absolutePath);
 
-        try (FileReader fr = new FileReader(file);) {
+        try (Scanner sc = new Scanner(file)) {
 
-            int nextChar = 0;
-            while (nextChar != -1) {
-                content += (char) nextChar;
-                nextChar = fr.read();
+            while (sc.hasNextLine()) {
+                content += sc.nextLine();
             }
+            // alternative:
+            // FileReader fr = new FileReader(file);
+            // int nextChar = 0;
+            // while (nextChar != -1) {
+            // content += (char) nextChar;
+            // nextChar = fr.read();
+            // }
         } catch (Exception e) {
-            // TODO: handle exception
             e.printStackTrace();
+            content += "null";
         }
 
         return content;
@@ -104,14 +104,15 @@ public class TextNote extends Note {
 
         // try-with-resource
         try (PrintWriter pw = new PrintWriter(file);) {
+
+            pw.print(this.getContent());
+            // alternative:
             // FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
             // OutputStreamWriter osw = new OutputStreamWriter(fos);
-            pw.write(this.getContent());
             // osw.write(this.getContent());
             // osw.close();
             // fos.close();
         } catch (Exception e) {
-            // TODO: handle exception
             e.printStackTrace();
             System.out.println("Cannot export to the specified directory!");
         }
