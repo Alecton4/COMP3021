@@ -1,17 +1,33 @@
 package base;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
-public class Folder implements Comparable<Folder> {
+public class Folder implements Comparable<Folder>, Serializable {
     private String name;
     private ArrayList<Note> notes;
+    private static final long serialVersionUID = 1L;
 
     public Folder(String name) {
         this.name = name;
         this.notes = new ArrayList<Note>();
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * @return the notes
+     */
+    public ArrayList<Note> getNotes() {
+        return this.notes;
     }
 
     public void addNote(Note newNote) {
@@ -108,20 +124,6 @@ public class Folder implements Comparable<Folder> {
         return result;
     }
 
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * @return the notes
-     */
-    public ArrayList<Note> getNotes() {
-        return this.notes;
-    }
-
     @Override
     public String toString() {
         int numTextNote = 0;
@@ -152,5 +154,4 @@ public class Folder implements Comparable<Folder> {
     public int compareTo(Folder anotherFolder) {
         return this.name.compareTo(anotherFolder.getName());
     }
-
 }

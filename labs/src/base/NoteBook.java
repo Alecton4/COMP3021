@@ -1,14 +1,45 @@
 package base;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class NoteBook {
+public class NoteBook implements Serializable {
     private ArrayList<Folder> folders;
 
     public NoteBook() {
         this.folders = new ArrayList<Folder>();
+    }
+
+    /**
+     * Constructor of an object NoteBook from an object serialization on disk
+     *
+     * @param filePath, the path of the file for loading the object
+     *                      serialization
+     */
+    public NoteBook(String filePath) {
+        // try-with-resource
+        try (FileInputStream fis = new FileInputStream(filePath);
+                ObjectInputStream ois = new ObjectInputStream(fis);) {
+
+            NoteBook n = (NoteBook) ois.readObject();
+            this.folders = n.getFolders();
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    /**
+     * @return the folders
+     */
+    public ArrayList<Folder> getFolders() {
+        return this.folders;
     }
 
     public boolean createImageNote(String folderName, String title) {
@@ -62,10 +93,23 @@ public class NoteBook {
     }
 
     /**
-     * @return the folders
+     * method to save the NoteBook instance to file
+     *
+     * @param filePath, the path of the file where to save the object
+     *                      serialization
+     * @return true if save on file is successful, false otherwise
      */
-    public ArrayList<Folder> getFolders() {
-        return this.folders;
+    public boolean save(String filePath) {
+        // try-with-resource
+        try (FileOutputStream fos = new FileOutputStream(filePath);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+
+            oos.writeObject(this);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

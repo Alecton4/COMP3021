@@ -1,18 +1,22 @@
 package base;
 
+import java.io.File;
+import java.io.Serializable;
 import java.util.Date;
 
-public class Note implements Comparable<Note> {
+public class Note implements Comparable<Note>, Serializable {
     private String title;
     private Date date;
+    private static final long serialVersionUID = 1L;
 
     public Note(String title) {
         this.title = title;
         this.date = new Date(System.currentTimeMillis());
     }
 
-    public boolean containsKeyword(String target) {
-        return StringHelper.containsIgnoreCase(this.title, target);
+    public Note(File file) {
+        this.title = file.getName();
+        this.date = new Date(System.currentTimeMillis());
     }
 
     /**
@@ -27,6 +31,10 @@ public class Note implements Comparable<Note> {
      */
     public Date getDate() {
         return this.date;
+    }
+
+    public boolean containsKeyword(String target) {
+        return StringHelper.containsIgnoreCase(this.title, target);
     }
 
     @Override
