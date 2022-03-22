@@ -31,6 +31,13 @@ public class Hospital {
         this.MildPatients = new ArrayList<>();
     }
 
+    /**
+     * @return the hospitalID
+     */
+    public String getHospitalID() {
+        return HospitalID;
+    }
+
     /* Get the location of the hospital */
     public Location getLoc() {
         return this.loc;
@@ -58,7 +65,19 @@ public class Hospital {
     /* Add a patient to the corresponding patient list */
     public boolean addPatient(Patient patient) {
         switch (patient.getSymptomLevel()) {
-            // TODO: handle three kinds of the symptom levels
+            // REVIEW: handle three kinds of the symptom levels
+            case Critical:
+                this.CriticalPatients.add(patient);
+                this.cap.decreaseCapacity(SymptomLevel.Critical);
+                return true;
+            case Moderate:
+                this.ModeratePatients.add(patient);
+                this.cap.decreaseCapacity(SymptomLevel.Moderate);
+                return true;
+            case Mild:
+                this.MildPatients.add(patient);
+                this.cap.decreaseCapacity(SymptomLevel.Mild);
+                return true;
             default:
                 break;
         }
@@ -68,7 +87,19 @@ public class Hospital {
     /* Remove a patient from the corresponding patient list */
     public boolean releasePatient(Patient patient) {
         switch (patient.getSymptomLevel()) {
-            // TODO: handle three kinds of the symptom levels
+            // REVIEW: handle three kinds of the symptom levels
+            case Critical:
+                this.CriticalPatients.remove(patient);
+                this.cap.increaseCapacity(SymptomLevel.Critical);
+                return true;
+            case Moderate:
+                this.ModeratePatients.remove(patient);
+                this.cap.increaseCapacity(SymptomLevel.Moderate);
+                return true;
+            case Mild:
+                this.MildPatients.remove(patient);
+                this.cap.increaseCapacity(SymptomLevel.Mild);
+                return true;
             default:
                 break;
         }

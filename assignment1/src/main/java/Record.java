@@ -66,7 +66,7 @@ public class Record {
 
     /*
      * Dump the record info as a string
-     * DO NOT change the functionality of the method
+     * !!! DO NOT change the functionality of the method
      * Otherwise, you may generate wrong results in Task 1
      */
     public String toString() {

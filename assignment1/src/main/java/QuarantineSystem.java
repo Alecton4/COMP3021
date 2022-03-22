@@ -2,7 +2,11 @@ package main.java;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class QuarantineSystem {
     public static class DashBoard {
@@ -39,10 +43,14 @@ public class QuarantineSystem {
 
     private List<Person> People;
     private List<Patient> Patients;
-
-    private List<Record> Records;
     private List<Hospital> Hospitals;
+    private List<Record> Records;
+
     private int newHospitalNum;
+
+    private Map<String, Person> PeopleMap;
+    private Map<String, Patient> PatientsMap;
+    private Map<String, Hospital> HospitalsMap;
 
     private DashBoard dashBoard;
 
@@ -50,8 +58,15 @@ public class QuarantineSystem {
         importPeople();
         importHospital();
         importRecords();
-        dashBoard = null;
-        Patients = new ArrayList<>();
+        this.dashBoard = null;
+        this.Patients = new ArrayList<>();
+
+        // maintain map for easy look up
+        this.PeopleMap = People.stream()
+                .collect(Collectors.toMap(Person::getIDCardNo, Function.identity(), (key1, key2) -> key2));
+        this.PatientsMap = new HashMap<>();
+        this.HospitalsMap = Hospitals.stream()
+                .collect(Collectors.toMap(Hospital::getHospitalID, Function.identity(), (key1, key2) -> key2));
     }
 
     public void startQuarantine() throws IOException {
@@ -60,31 +75,94 @@ public class QuarantineSystem {
          */
         System.out.println("Task 1: Saving Patients");
         /*
-         * TODO: Process each record
+         * REVIEW: Process each record
          */
+        for (Record record : this.Records) {
+            switch (record.getStatus()) {
+                case Confirmed:
+                    this.saveSinglePatient(record);
+                    break;
+                case Recovered:
+                    this.releaseSinglePatient(record);
+                    break;
+                default:
+                    System.out.println("Something is WRONG in this record!");
+                    break;
+            }
+        }
         exportRecordTreatment();
 
         /*
          * Task 2: Displaying Statistics
          */
         System.out.println("Task 2: Displaying Statistics");
-        dashBoard = new DashBoard(this.People);
-        dashBoard.runDashBoard();
+        this.dashBoard = new DashBoard(this.People);
+        this.dashBoard.runDashBoard();
         exportDashBoard();
     }
 
     /*
-     * Save a single patient when the status of the record is Confirmed
+     * REVIEW: Save a single patient when the status of the record is Confirmed
      */
     public void saveSinglePatient(Record record) {
-        // TODO
+        // get the person corresponding to the ID
+        Person person = this.PeopleMap.get(record.getIDCardNo());
+
+        // find the nearest available hospital
+        SymptomLevel symptomLevel = record.getSymptomLevel();
+        int minDis = Integer.MAX_VALUE;
+        Hospital nearestHospital = null;
+        for (Hospital hospital : this.Hospitals) {
+            if (hospital.getCapacity().getSingleCapacity(symptomLevel) > 0) {
+                int distance = person.getLoc().getDisSquare(hospital.getLoc());
+                if (distance < minDis) {
+                    minDis = distance;
+                    nearestHospital = hospital;
+                }
+            }
+        }
+
+        // if no such hospital, create a new hospital
+        if (nearestHospital == null) {
+            newHospitalNum++;
+            String newHosID = "H-New-" + newHospitalNum;
+            Capacity newHosCap = new Capacity(5, 10, 20);
+            minDis = 0;
+            // Hospitals.add(new Hospital(newHosID, person.getLoc(), newHosCap));
+            // nearestHospital = Hospitals.get(Hospitals.size() - 1);
+            // ??? is this doable
+            nearestHospital = new Hospital(newHosID, person.getLoc(), newHosCap);
+            this.Hospitals.add(nearestHospital);
+            this.HospitalsMap.put(newHosID, nearestHospital);
+        }
+
+        // add person as patient
+        Patient patient = new Patient(person, symptomLevel);
+        patient.setHospitalID(nearestHospital.getHospitalID());
+        nearestHospital.addPatient(patient);
+        this.Patients.add(patient);
+        this.PatientsMap.put(patient.getIDCardNo(), patient);
+
+        // set Hospital ID in corresponding record;
+        record.setHospitalID(nearestHospital.getHospitalID());
     }
 
     /*
-     * Release a single patient when the status of the record is Recovered
+     * REVIEW: Release a single patient when the status of the record is Recovered
      */
     public void releaseSinglePatient(Record record) {
-        // TODO
+        // get the patient corresponding to the ID
+        Patient patient = this.PatientsMap.get(record.getIDCardNo());
+        // get the corresponding hospital
+        Hospital hospital = this.HospitalsMap.get(patient.getHospitalID());
+
+        // release patient from hospital
+        hospital.releasePatient(patient);
+        this.Patients.remove(patient);
+        this.PatientsMap.remove(patient.getIDCardNo());
+
+        // set Hospital ID in corresponding record;
+        record.setHospitalID(hospital.getHospitalID());
     }
 
     /*
@@ -94,7 +172,7 @@ public class QuarantineSystem {
      */
     public void importPeople() throws IOException {
         this.People = new ArrayList<>();
-        File filename = new File("data/Person.txt");
+        File filename = new File("./assignment1/data/Person.txt");
         InputStreamReader reader = new InputStreamReader(new FileInputStream(filename));
         BufferedReader br = new BufferedReader(reader);
         String line = br.readLine();
@@ -130,7 +208,7 @@ public class QuarantineSystem {
     public void importRecords() throws IOException {
         this.Records = new ArrayList<>();
 
-        File filename = new File("data/Record.txt");
+        File filename = new File("./assignment1/data/Record.txt");
         InputStreamReader reader = new InputStreamReader(new FileInputStream(filename));
         BufferedReader br = new BufferedReader(reader);
         String line = br.readLine();
@@ -161,7 +239,7 @@ public class QuarantineSystem {
         this.Hospitals = new ArrayList<>();
         this.newHospitalNum = 0;
 
-        File filename = new File("data/Hospital.txt");
+        File filename = new File("./assignment1/data/Hospital.txt");
         InputStreamReader reader = new InputStreamReader(new FileInputStream(filename));
         BufferedReader br = new BufferedReader(reader);
         String line = br.readLine();
@@ -191,11 +269,11 @@ public class QuarantineSystem {
     /*
      * Export the information of the records
      * The data is finally dumped into RecordTreatment.txt
-     * DO NOT change the functionality of the method
+     * !!! DO NOT change the functionality of the method
      * Otherwise, you may generate wrong results in Task 1
      */
     public void exportRecordTreatment() throws IOException {
-        File filename = new File("output/RecordTreatment.txt");
+        File filename = new File("./assignment1/output/my_RecordTreatment.txt");
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(filename));
         BufferedWriter bw = new BufferedWriter(writer);
         bw.write("IDCardNo        SymptomLevel        Status        HospitalID\n");
@@ -209,11 +287,11 @@ public class QuarantineSystem {
     /*
      * Export the information of the dashboard
      * The data is finally dumped into Statistics.txt
-     * DO NOT change the functionality of the method
+     * !!! DO NOT change the functionality of the method
      * Otherwise, you may generate wrong results in Task 2
      */
     public void exportDashBoard() throws IOException {
-        File filename = new File("output/Statistics.txt");
+        File filename = new File("./assignment1/output/my_Statistics.txt");
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(filename));
         BufferedWriter bw = new BufferedWriter(writer);
 

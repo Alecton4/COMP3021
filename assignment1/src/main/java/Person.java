@@ -1,7 +1,7 @@
 package main.java;
 
 public class Person {
-    String IDCardNo;
+    private String IDCardNo;
     private Location loc;
     private String gender;
     private int age;
@@ -10,7 +10,12 @@ public class Person {
 
     /* Class Constructor */
     public Person(String p_IDCardNo, Location p_loc, String p_gender, int p_age, boolean p_isVac) {
-        // TODO
+        // REVIEW
+        this.setIDCardNo(p_IDCardNo);
+        this.setLoc(p_loc);
+        this.setGender(p_gender);
+        this.setAge(p_age);
+        this.setIsVac(p_isVac);
     }
 
     public void setIDCardNo(String p_IDCardNo) {

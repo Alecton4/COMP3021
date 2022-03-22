@@ -13,7 +13,7 @@ public class Patient extends Person {
      * Remember to initialize the attributes in the Person
      */
     public Patient(Person p, SymptomLevel p_symptomLevel) {
-        // TODO
+        // REVIEW
         super(p.getIDCardNo(), p.getLoc(), p.getGender(), p.getAge(), p.getIsVac());
         this.setSymptomLevel(p_symptomLevel);
     }
