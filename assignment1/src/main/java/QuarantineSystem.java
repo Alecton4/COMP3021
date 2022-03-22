@@ -30,14 +30,46 @@ public class QuarantineSystem {
             for (int i = 0; i < 8; i++) {
                 this.patientNums.add(0);
                 this.infectNums.add(0);
+                this.infectAvgNums.add(0.0);
                 this.vacNums.add(0);
                 this.vacInfectNums.add(0);
             }
 
             /*
-             * TODO: Collect the statistics based on People
+             * REVIEW: Collect the statistics based on People
              * Add the data in the lists, such as patientNums, infectNums, etc.
              */
+            for (Person person : this.People) {
+                int age = person.getAge();
+                boolean isVac = person.getIsVac();
+                int infectCnt = person.getInfectCnt();
+                int groupID = (age > 69) ? 7 : age / 10;
+
+                int currPatientNum = this.patientNums.get(groupID);
+                int currInfectNum = this.infectNums.get(groupID);
+                double currInfectAvgNum = this.infectAvgNums.get(groupID);
+                int currVacNum = this.vacNums.get(groupID);
+                int currVacInfectNum = this.vacInfectNums.get(groupID);
+
+                if (infectCnt > 0) {
+                    currPatientNum++;
+                    currInfectNum += infectCnt;
+                    currInfectAvgNum = (double) currInfectNum / currPatientNum;
+                    this.patientNums.set(groupID, currPatientNum);
+                    this.infectNums.set(groupID, currInfectNum);
+                    this.infectAvgNums.set(groupID, currInfectAvgNum);
+
+                    if (isVac) {
+                        currVacInfectNum++;
+                        this.vacInfectNums.set(groupID, currVacInfectNum);
+                    }
+                }
+
+                if (isVac) {
+                    currVacNum++;
+                    this.vacNums.set(groupID, currVacNum);
+                }
+            }
         }
     }
 
@@ -48,6 +80,7 @@ public class QuarantineSystem {
 
     private int newHospitalNum;
 
+    // maintain map for easy look up
     private Map<String, Person> PeopleMap;
     private Map<String, Patient> PatientsMap;
     private Map<String, Hospital> HospitalsMap;
@@ -62,10 +95,11 @@ public class QuarantineSystem {
         this.Patients = new ArrayList<>();
 
         // maintain map for easy look up
-        this.PeopleMap = People.stream()
+        this.PeopleMap = this.People.stream()
                 .collect(Collectors.toMap(Person::getIDCardNo, Function.identity(), (key1, key2) -> key2));
-        this.PatientsMap = new HashMap<>();
-        this.HospitalsMap = Hospitals.stream()
+        this.PatientsMap = this.Patients.stream()
+                .collect(Collectors.toMap(Patient::getIDCardNo, Function.identity(), (key1, key2) -> key2));
+        this.HospitalsMap = this.Hospitals.stream()
                 .collect(Collectors.toMap(Hospital::getHospitalID, Function.identity(), (key1, key2) -> key2));
     }
 
@@ -107,6 +141,7 @@ public class QuarantineSystem {
     public void saveSinglePatient(Record record) {
         // get the person corresponding to the ID
         Person person = this.PeopleMap.get(record.getIDCardNo());
+        person.setInfectCnt(person.getInfectCnt() + 1);
 
         // find the nearest available hospital
         SymptomLevel symptomLevel = record.getSymptomLevel();
@@ -184,7 +219,7 @@ public class QuarantineSystem {
                 String[] records = line.split("        ");
                 assert (records.length == 6);
                 String pIDCardNo = records[0];
-                System.out.println(pIDCardNo);
+                // System.out.println(pIDCardNo);
                 int XLoc = Integer.parseInt(records[1]);
                 int YLoc = Integer.parseInt(records[2]);
                 Location pLoc = new Location(XLoc, YLoc);
@@ -220,7 +255,7 @@ public class QuarantineSystem {
                 String[] records = line.split("        ");
                 assert (records.length == 3);
                 String pIDCardNo = records[0];
-                System.out.println(pIDCardNo);
+                // System.out.println(pIDCardNo);
                 assert (records[1].equals("Critical") || records[1].equals("Moderate") || records[1].equals("Mild"));
                 assert (records[2].equals("Confirmed") || records[2].equals("Recovered"));
                 Record r = new Record(pIDCardNo, records[1], records[2]);
@@ -251,7 +286,7 @@ public class QuarantineSystem {
                 String[] records = line.split("        ");
                 assert (records.length == 6);
                 String pHospitalID = records[0];
-                System.out.println(pHospitalID);
+                // System.out.println(pHospitalID);
                 int XLoc = Integer.parseInt(records[1]);
                 int YLoc = Integer.parseInt(records[2]);
                 Location pLoc = new Location(XLoc, YLoc);
