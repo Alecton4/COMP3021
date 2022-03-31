@@ -1,4 +1,4 @@
-package base;
+package lab05;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,16 +14,20 @@ public class Heap<T extends Comparable<T>> {
     private ArrayList<T> container;
 
     public Heap() {
-        container = new ArrayList<>();
+        this.container = new ArrayList<>();
     }
 
     /**
      * @return If size is 0, throw {@link IllegalStateException}.
      *         Otherwise, return the first element of {@link this#container}
      */
-    public T peek() {
-        // TODO
-        return null; // replace this line with implementation
+    public T peek() throws IllegalStateException {
+        // REVIEW
+        if (this.container.size() == 0) {
+            throw new IllegalStateException();
+        }
+        return this.container.get(0);
+        // return null; // replace this line with implementation
     }
 
     /**
@@ -35,9 +39,18 @@ public class Heap<T extends Comparable<T>> {
      *         Call {@link this#heapifyDown()}, then return the original first
      *         element
      */
-    public T poll() {
-        // TODO
-        return null; // replace this line with implementation
+    public T poll() throws IllegalStateException {
+        // REVIEW
+        int containerSize = this.container.size();
+        if (containerSize == 0) {
+            throw new IllegalStateException();
+        }
+        T firstElement = this.container.get(0);
+        this.container.set(0, container.get(containerSize - 1));
+        this.container.remove(containerSize - 1);
+        this.heapifyDown();
+        return firstElement;
+        // return null; // replace this line with implementation
     }
 
     private void heapifyDown() {
@@ -63,7 +76,9 @@ public class Heap<T extends Comparable<T>> {
      * @param obj the object to add
      */
     public void add(T obj) {
-        // TODO
+        // REVIEW
+        this.container.add(obj);
+        this.heapifyUp();
     }
 
     public void addAll(Collection<T> list) {
@@ -77,7 +92,15 @@ public class Heap<T extends Comparable<T>> {
      * parent.
      */
     private void heapifyUp() {
-        // TODO
+        // REVIEW
+        int idxCurrLastElement = this.container.size() - 1;
+        int idxParent = this.getParentIndex(idxCurrLastElement);
+        while (this.hasParent(idxCurrLastElement)
+                && (this.container.get(idxCurrLastElement)).compareTo(this.container.get(idxParent)) == -1) {
+            this.swap(idxCurrLastElement, idxParent);
+            idxCurrLastElement = idxParent;
+            idxParent = this.getParentIndex(idxCurrLastElement);
+        }
     }
 
     public int size() {

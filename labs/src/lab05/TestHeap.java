@@ -1,4 +1,4 @@
-package base;
+package lab05;
 
 
 import java.util.Arrays;
