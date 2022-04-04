@@ -1,6 +1,12 @@
-# docs
-lectures/
+# refs
 old/
+lectures/
+src_provided/
+
+# data for testing
+data/
+output/
+sampleData/
 
 # Compiled class file
 *.class
