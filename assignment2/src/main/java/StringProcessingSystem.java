@@ -43,10 +43,16 @@ public class StringProcessingSystem {
         System.out.print("Please input amount of shift: ");
         int shiftAmount = scanner.nextInt();
 
-        // TODO 3: Shift characters to the right by the amount specified by shiftAmount
+        // REVIEW 3: Shift characters to the right by the amount specified by shiftAmount
         // e.g., Input string: "Hello World"
         // shiftAmount: 3
         // Result: "rldHello Wo"
+        int textLength = originalText.length();
+        shiftAmount = shiftAmount % textLength;
+        String newHead = originalText.substring(textLength - shiftAmount, textLength);
+        String newTail = originalText.substring(0, textLength - shiftAmount);
+        String shiftedString = newHead + newTail;
+        System.out.println("After shifting \"" + originalText + "\" by " + shiftAmount + ": \"" + shiftedString + "\"");
     }
 
     public static void countVowels() {
