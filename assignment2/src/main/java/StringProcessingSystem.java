@@ -6,13 +6,13 @@ public class StringProcessingSystem {
     private static String originalText;
     private static String modifiedText; // It is not complustory to update this field. We just create it for you to
                                         // store the temporary result for the task 2,3, and 5.
-    private static Scanner reader = new Scanner(System.in); // static reader, no need to open reader in the methods of
-                                                            // the class
+    private static Scanner scanner = new Scanner(System.in); // static reader, no need to open reader in the methods of
+                                                             // the class
 
     public static void split() {
         System.out.print("Please input a delimiter: ");
         String target = "";
-        target = reader.next();
+        target = scanner.next();
 
         // REVIEW 1: Split the string whenever there is a delimiter
         // Output each substring in separate line
@@ -24,7 +24,7 @@ public class StringProcessingSystem {
 
     public static void removeSubstring() {
         System.out.print("Please input string to remove: ");
-        String target = reader.next();
+        String target = scanner.next();
 
         // REVIEW 2: Remove the target character sequence from the original string
         // if it doesn't exist in the string, output "target is not found"
@@ -41,7 +41,7 @@ public class StringProcessingSystem {
 
     public static void shiftString() {
         System.out.print("Please input amount of shift: ");
-        int shiftAmount = reader.nextInt();
+        int shiftAmount = scanner.nextInt();
 
         // TODO 3: Shift characters to the right by the amount specified by shiftAmount
         // e.g., Input string: "Hello World"
@@ -50,14 +50,21 @@ public class StringProcessingSystem {
     }
 
     public static void countVowels() {
-        // TODO 4: Count number of vowels in String. (A, E, I, O, U, a, e, i, o, and u)
-
+        // REVIEW 4: Count number of vowels in String.
+        // (A, E, I, O, U, a, e, i, o, and u)
+        int count = 0;
+        count += containsIgnoreCase(originalText, "A");
+        count += containsIgnoreCase(originalText, "E");
+        count += containsIgnoreCase(originalText, "I");
+        count += containsIgnoreCase(originalText, "O");
+        count += containsIgnoreCase(originalText, "U");
+        System.out.println("Number of vowels in \"" + originalText + "\": " + count);
     }
 
     public static void ceaserCipher() {
         System.out.print("Please input amount of shift: ");
         // Scanner reader = new Scanner(System.in); // Scanner is used for Java input
-        int shift = reader.nextInt();
+        int shift = scanner.nextInt();
 
         // TODO 5: Rotate each characters forward by the amount specified by
         // shiftAmount. Any numbers and special characters should be left the same.
@@ -66,6 +73,33 @@ public class StringProcessingSystem {
         // shiftAmount: 30
         // Result: "LIPPS ASVPH! 123"
 
+    }
+
+    public static int containsIgnoreCase(String source, String target) {
+        final int SOURCE_LENGTH = source.length();
+        final int TARGET_LENGTH = target.length();
+        if (TARGET_LENGTH == 0) {
+            return 0;
+        }
+
+        final char FIRST_TARGET_CHAR_LOWER = Character.toLowerCase(target.charAt(0));
+        final char FIRST_TARGET_CHAR_UPPER = Character.toUpperCase(target.charAt(0));
+
+        int count = 0;
+        for (int i = SOURCE_LENGTH - TARGET_LENGTH; i >= 0; --i) {
+            // Quick check before calling the more expensive regionMatches() method:
+            char ch = source.charAt(i);
+            if (ch != FIRST_TARGET_CHAR_LOWER && ch != FIRST_TARGET_CHAR_UPPER) {
+                continue;
+            }
+
+            // Tests if two string regions are equal
+            if (source.regionMatches(true, i, target, 0, TARGET_LENGTH)) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     public static void main(String args[]) {
