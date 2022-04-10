@@ -14,21 +14,29 @@ public class StringProcessingSystem {
         String target = "";
         target = reader.next();
 
-        // TODO 1: Split the string whenever there is a delimiter
+        // REVIEW 1: Split the string whenever there is a delimiter
         // Output each substring in separate line
+        String[] splittedStrings = originalText.split(target);
+        for (String splittedString : splittedStrings) {
+            System.out.println(splittedString);
+        }
     }
 
     public static void removeSubstring() {
         System.out.print("Please input string to remove: ");
         String target = reader.next();
 
-        System.out.println("String before removing \'" + target + "\': " + originalText);
-
-        // TODO 2: Remove the target character sequence from the original string
+        // REVIEW 2: Remove the target character sequence from the original string
         // if it doesn't exist in the string, output "target is not found"
         // e.g., original = "Hello World", target = "Wor"
         // target = "Hello ld"
-
+        String processedString = originalText.replaceAll(target, "");
+        if (processedString.equals(originalText)) {
+            System.out.println("Target not found!");
+        } else {
+            System.out.println("String before removing \'" + target + "\': " + originalText);
+            System.out.println("String after removing \'" + target + "\': " + processedString);
+        }
     }
 
     public static void shiftString() {
