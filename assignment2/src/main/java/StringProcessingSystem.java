@@ -12,7 +12,10 @@ public class StringProcessingSystem {
     public static void split() {
         System.out.print("Please input a delimiter: ");
         String target = "";
-        target = scanner.next();
+        // set scanner delimiter to accept space
+        // scanner.useDelimiter("\r\n");
+        // target = scanner.next();
+        target = scanner.nextLine();
 
         // REVIEW 1: Split the string whenever there is a delimiter
         // Output each substring in separate line
