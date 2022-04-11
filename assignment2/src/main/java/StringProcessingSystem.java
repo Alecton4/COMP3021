@@ -30,12 +30,12 @@ public class StringProcessingSystem {
         // if it doesn't exist in the string, output "target is not found"
         // e.g., original = "Hello World", target = "Wor"
         // target = "Hello ld"
-        String processedString = originalText.replaceAll(target, "");
-        if (processedString.equals(originalText)) {
+        modifiedText = originalText.replaceAll(target, "");
+        if (modifiedText.equals(originalText)) {
             System.out.println("Target not found!");
         } else {
             System.out.println("String before removing \'" + target + "\': " + originalText);
-            System.out.println("String after removing \'" + target + "\': " + processedString);
+            System.out.println("String after removing \'" + target + "\': " + modifiedText);
         }
     }
 
@@ -49,11 +49,18 @@ public class StringProcessingSystem {
         // shiftAmount: 3
         // Result: "rldHello Wo"
         int textLength = originalText.length();
-        shiftAmount = shiftAmount % textLength;
-        String newHead = originalText.substring(textLength - shiftAmount, textLength);
-        String newTail = originalText.substring(0, textLength - shiftAmount);
-        String shiftedString = newHead + newTail;
-        System.out.println("After shifting \"" + originalText + "\" by " + shiftAmount + ": \"" + shiftedString + "\"");
+        if (shiftAmount > 0) {
+            int absShiftAmount = shiftAmount % textLength;
+            String newHead = originalText.substring(textLength - absShiftAmount, textLength);
+            String newTail = originalText.substring(0, textLength - absShiftAmount);
+            modifiedText = newHead + newTail;
+        } else {
+            int absShiftAmount = (-shiftAmount) % textLength;
+            String newHead = originalText.substring(absShiftAmount, textLength);
+            String newTail = originalText.substring(0, absShiftAmount);
+            modifiedText = newHead + newTail;
+        }
+        System.out.println("After shifting \"" + originalText + "\" by " + shiftAmount + ": \"" + modifiedText + "\"");
     }
 
     public static void countVowels() {
@@ -80,8 +87,8 @@ public class StringProcessingSystem {
         // shiftAmount: 30
         // Result: "LIPPS ASVPH! 123"
         StringBuilder cipherText = new StringBuilder("");
-        for (int i = 0; i < StringProcessingSystem.originalText.length(); i++) {
-            char charToAppend = StringProcessingSystem.originalText.charAt(i);
+        for (int i = 0; i < originalText.length(); i++) {
+            char charToAppend = originalText.charAt(i);
             // ASCII: A=65,Z=90; a=97 z=122;
             if (charToAppend >= 'A' && charToAppend <= 'Z') {
                 int attempt = charToAppend + shiftAmount;
