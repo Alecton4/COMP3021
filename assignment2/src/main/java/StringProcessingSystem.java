@@ -43,7 +43,8 @@ public class StringProcessingSystem {
         System.out.print("Please input amount of shift: ");
         int shiftAmount = scanner.nextInt();
 
-        // REVIEW 3: Shift characters to the right by the amount specified by shiftAmount
+        // REVIEW 3: Shift characters to the right
+        // by the amount specified by shiftAmount
         // e.g., Input string: "Hello World"
         // shiftAmount: 3
         // Result: "rldHello Wo"
@@ -70,15 +71,38 @@ public class StringProcessingSystem {
     public static void ceaserCipher() {
         System.out.print("Please input amount of shift: ");
         // Scanner reader = new Scanner(System.in); // Scanner is used for Java input
-        int shift = scanner.nextInt();
+        int shiftAmount = scanner.nextInt();
 
-        // TODO 5: Rotate each characters forward by the amount specified by
+        // REVIEW 5: Rotate each characters forward by the amount specified by
         // shiftAmount. Any numbers and special characters should be left the same.
         // Also, The string should be converted into capital letters first
         // e.g., Input string: "Hello World! 123"
         // shiftAmount: 30
         // Result: "LIPPS ASVPH! 123"
-
+        StringBuilder cipherText = new StringBuilder("");
+        for (int i = 0; i < StringProcessingSystem.originalText.length(); i++) {
+            char charToAppend = StringProcessingSystem.originalText.charAt(i);
+            // ASCII: A=65,Z=90; a=97 z=122;
+            if (charToAppend >= 'A' && charToAppend <= 'Z') {
+                int attempt = charToAppend + shiftAmount;
+                if (attempt > 90)
+                    charToAppend = (char) (65 + (attempt - 91));
+                else {
+                    charToAppend = (char) attempt;
+                }
+            } else if (charToAppend >= 'a' && charToAppend <= 'z') {
+                int attempt = charToAppend + shiftAmount;
+                if (attempt > 122)
+                    charToAppend = Character.toUpperCase((char) (97 + (attempt - 123)));
+                else {
+                    charToAppend = Character.toUpperCase((char) attempt);
+                }
+            } else {
+                // do nothing
+            }
+            cipherText.append(charToAppend);
+        }
+        System.out.println("Cipher text: \"" + cipherText + "\"");
     }
 
     public static int containsIgnoreCase(String source, String target) {
@@ -88,13 +112,12 @@ public class StringProcessingSystem {
             return 0;
         }
 
-        final char FIRST_TARGET_CHAR_LOWER = Character.toLowerCase(target.charAt(0));
-        final char FIRST_TARGET_CHAR_UPPER = Character.toUpperCase(target.charAt(0));
-
         int count = 0;
         for (int i = SOURCE_LENGTH - TARGET_LENGTH; i >= 0; --i) {
             // Quick check before calling the more expensive regionMatches() method:
-            char ch = source.charAt(i);
+            final char FIRST_TARGET_CHAR_LOWER = Character.toLowerCase(target.charAt(0));
+            final char FIRST_TARGET_CHAR_UPPER = Character.toUpperCase(target.charAt(0));
+            final char ch = source.charAt(i);
             if (ch != FIRST_TARGET_CHAR_LOWER && ch != FIRST_TARGET_CHAR_UPPER) {
                 continue;
             }
