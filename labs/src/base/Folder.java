@@ -140,13 +140,13 @@ public class Folder implements Comparable<Folder>, Serializable {
 
     @Override
     public int hashCode() {
-        // TODO Auto-generated method stub
+        // REVIEW Auto-generated method stub
         return super.hashCode();
     }
 
     // @Override
     public boolean equals(Folder anotherFolder) {
-        // TODO Auto-generated method stub
+        // REVIEW Auto-generated method stub
         return this.name.equals(anotherFolder.getName());
     }
 

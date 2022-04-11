@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * TODO class declaration
+ * REVIEW class declaration
  * We want to accept any type which is comparable to itself
  *
  * @param <T>

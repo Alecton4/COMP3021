@@ -44,13 +44,13 @@ public class Note implements Comparable<Note>, Serializable {
 
     @Override
     public int hashCode() {
-        // TODO Auto-generated method stub
+        // REVIEW Auto-generated method stub
         return super.hashCode();
     }
 
     // @Override
     public boolean equals(Note anotherNote) {
-        // TODO Auto-generated method stub
+        // REVIEW Auto-generated method stub
         return this.title.equals(anotherNote.getTitle());
     }
 
