@@ -1,4 +1,4 @@
-package midterm;
+package midterm01;
 
 public class BitCoin extends Coin {
     private double amount;

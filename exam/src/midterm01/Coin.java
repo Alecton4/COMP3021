@@ -1,4 +1,4 @@
-package midterm;
+package midterm01;
 
 public abstract class Coin {
 	private String representation;
