@@ -20,7 +20,7 @@ public class NoteBook implements Serializable {
      * Constructor of an object NoteBook from an object serialization on disk
      *
      * @param filePath, the path of the file for loading the object
-     *                      serialization
+     *                  serialization
      */
     public NoteBook(String filePath) {
         // try-with-resource
@@ -40,6 +40,26 @@ public class NoteBook implements Serializable {
      */
     public ArrayList<Folder> getFolders() {
         return this.folders;
+    }
+
+    public boolean insertFolder(String folderName) {
+
+        for (Folder folder : folders) {
+            if (folder.equals(new Folder(folderName))) {
+                return false;
+            }
+
+        }
+        folders.add(new Folder(folderName));
+        return true;
+
+    }
+
+    public void sortFolders() {
+        for (Folder folder : this.folders) {
+            folder.sortNotes();
+        }
+        Collections.sort(this.folders);
     }
 
     public boolean createImageNote(String folderName, String title) {
@@ -77,6 +97,33 @@ public class NoteBook implements Serializable {
         return true;
     }
 
+    public void editNote(String folderName, Note note, String content) {
+        for (Folder folder : folders) {
+            if (folder.equals(new Folder(folderName))) {
+                for (Note transNote : folder.getNotes()) {
+                    if (note.equals(transNote)) {
+                        ((TextNote) transNote).setContent(content);
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean removeNote(String folderName, Note note) {
+        for (Folder folder : folders) {
+            if (folder.equals(new Folder(folderName))) {
+                for (Note transNote : folder.getNotes()) {
+                    if (note.equals(transNote)) {
+                        folder.removeNote(transNote);
+                        return true;
+                    }
+                }
+            }
+
+        }
+        return false;
+    }
+
     public List<Note> searchNotes(String keywords) {
         List<Note> result = new ArrayList<Note>();
         for (Folder folder : this.folders) {
@@ -85,18 +132,11 @@ public class NoteBook implements Serializable {
         return result;
     }
 
-    public void sortFolders() {
-        for (Folder folder : this.folders) {
-            folder.sortNotes();
-        }
-        Collections.sort(this.folders);
-    }
-
     /**
      * method to save the NoteBook instance to file
      *
      * @param filePath, the path of the file where to save the object
-     *                      serialization
+     *                  serialization
      * @return true if save on file is successful, false otherwise
      */
     public boolean save(String filePath) {

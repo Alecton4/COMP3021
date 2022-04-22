@@ -38,6 +38,13 @@ public class TextNote extends Note {
     }
 
     /**
+     * @param content the content to set
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
      * get the content of a file
      *
      * @param absolutePath of the file

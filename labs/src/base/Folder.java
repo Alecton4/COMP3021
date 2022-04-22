@@ -34,6 +34,10 @@ public class Folder implements Comparable<Folder>, Serializable {
         this.notes.add(newNote);
     }
 
+    public void removeNote(Note note) {
+        notes.remove(note);
+    }
+
     public void sortNotes() {
         Collections.sort(this.notes);
     }
