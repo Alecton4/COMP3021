@@ -7,20 +7,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 
 public class TaskManagementSystem {
     public static ArrayList<Task> tasks;
-    // public static Map<String, Task> taskMapByID;
+    public static Map<String, Task> taskMapByID;
 
     public static void init() {
         tasks = new ArrayList<>();
-        // taskMapByID = tasks.stream().collect(Collectors.toMap(Task::getId,
-        // Function.identity(), (key1, key2) -> key2));
+        taskMapByID = tasks.stream().collect(Collectors.toMap(Task::getId,
+                Function.identity(), (key1, key2) -> key2));
     }
 
     /*
@@ -34,9 +36,12 @@ public class TaskManagementSystem {
      *
      * @param t: the task object to be added
      */
-    public static void appendNewTask(Task t) {
-        tasks.add(t);
-        // taskMapByID.put(t.getId(), t);
+    public static void appendNewTask(Task newTask) {
+        if (taskMapByID.containsKey(newTask.getId())) {
+            return;
+        }
+        tasks.add(newTask);
+        taskMapByID.put(newTask.getId(), newTask);
     }
 
     /**
@@ -122,7 +127,7 @@ public class TaskManagementSystem {
     public static boolean removeTask(Predicate<Task> p) {
         List<Task> taskList = findTasks(p);
         for (Task task : taskList) {
-            if (tasks.remove(task) != true) {
+            if ((tasks.remove(task) && taskMapByID.remove(task.getId(), task)) != true) {
                 return false;
             }
         }
@@ -237,6 +242,16 @@ public class TaskManagementSystem {
 
         int readingTaskNum = countTasks(byType(TaskType.READING));
         Assert.assertEquals(readingTaskNum, 3);
+
+        // my own tests
+        Task task7 = new Task("ID7", "Read Domain Driven Design book II", TaskType.READING,
+                LocalDate.of(2013, Month.JULY, 5)).addTag("ddd").addTag("books");
+        appendNewTask(task7);
+        List<String> tagList = new ArrayList<>();
+        tagList.add("books");
+        tagList.add("reading");
+        List mixedList = findTasks(andAll(genPredicates(TaskManagementSystem::byTag, tagList)));
+        Assert.assertEquals(mixedList.size(), 4);
 
         boolean isRemoved = removeTask(byCreationTime(LocalDate.of(2014, Month.JULY, 4)));
         Assert.assertTrue(isRemoved);
