@@ -250,8 +250,8 @@ public class TaskManagementSystem {
         List<String> tagList = new ArrayList<>();
         tagList.add("books");
         tagList.add("reading");
-        List mixedList = findTasks(andAll(genPredicates(TaskManagementSystem::byTag, tagList)));
-        Assert.assertEquals(mixedList.size(), 4);
+        List mixedList = findTasks(not(orAll(genPredicates(TaskManagementSystem::byTag, tagList))));
+        Assert.assertEquals(mixedList.size(), 3);
 
         boolean isRemoved = removeTask(byCreationTime(LocalDate.of(2014, Month.JULY, 4)));
         Assert.assertTrue(isRemoved);
