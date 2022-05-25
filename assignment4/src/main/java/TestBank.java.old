@@ -80,17 +80,25 @@ public class TestBank {
 		return sb.toString();
 	}
 
-	static Integer generateRandomInteger(int min, int max) {
+	static Integer generateRandomInteger(int integer) {
 		Random rnd = new Random();
-		return rnd.nextInt(max - min) + min;
+		return 1 + rnd.nextInt(integer);
 	}
 
 	static ArrayList<Account> getAccountList(int count) {
 		ArrayList<Account> resList = new ArrayList<Account>();
+		Set<String> usedNames = new TreeSet<String>();
+		for (int i = 0; i < count;) {
+			Integer balance = generateRandomInteger(1000);
+			String accountID = generateRandomName(8);
 
-		for (int i = 0; i < count; ++i) {
-			String accountID = "bankAccountID_" + i;
-			resList.add(new Account(accountID, 1000));
+			if (usedNames.contains(accountID)) {
+				continue;
+			}
+
+			resList.add(new Account(accountID, balance));
+			usedNames.add(accountID);
+			++i;
 		}
 		return resList;
 	}
@@ -105,18 +113,18 @@ public class TestBank {
 			int op = rnd.nextInt(3);
 			if (op == 0) { // "deposit"
 				Account acc = accList.get(rnd.nextInt(numAccount));
-				Integer amount = generateRandomInteger(100, 1000);
+				Integer amount = generateRandomInteger(100);
 				resList.add(new Transaction(acc.getAccountID(), "", "deposit", amount));
 			} else if (op == 1) { // "withdraw"
 				Account acc = accList.get(rnd.nextInt(numAccount));
-				Integer amount = generateRandomInteger(600, 2000);
+				Integer amount = generateRandomInteger(100);
 				resList.add(new Transaction(acc.getAccountID(), "", "withdraw", amount));
 			} else {
 				assert (op == 2);
 				Account acc1 = accList.get(rnd.nextInt(numAccount));
 				Account acc2 = accList.get(rnd.nextInt(numAccount));
 
-				Integer amount = generateRandomInteger(300, 1500);
+				Integer amount = generateRandomInteger(acc1.getBalance().intValue());
 				resList.add(new Transaction(acc1.getAccountID(), acc2.getAccountID(), "transfer", amount));
 			}
 		}
@@ -130,6 +138,11 @@ public class TestBank {
 
 	static double calculateScore(Bank bank, ArrayList<Account> accList, Set<Transaction> successTransactions,
 			double totalScore) {
+		if (successTransactions.isEmpty()) {
+			System.out.println("No succeessful transactions at all? Your code has some bugs!");
+			return 0.0;
+		}
+
 		Map<String, Integer> accountToBalance = new HashMap<String, Integer>();
 		for (Account acc : accList) {
 			accountToBalance.put(acc.getAccountID(), acc.getBalance());
@@ -173,16 +186,7 @@ public class TestBank {
 	static double singleThreadTest(ArrayList<Account> accList, ArrayList<Transaction> transactions, double totalScore) {
 		ConcreteBank bank = new ConcreteBank();
 		for (Account acc : accList) {
-			boolean addRes = bank.addAccount(acc.getAccountID(), acc.getBalance());
-			if (!addRes) {
-				System.out.println("Adding account fails!");
-				return 0.0;
-			}
-
-			if (!bank.getBalance(acc.getAccountID()).equals(acc.getBalance())) {
-				System.out.println("Initing account balance fails!");
-				return 0.0;
-			}
+			bank.addAccount(acc.getAccountID(), acc.getBalance());
 		}
 
 		Set<Transaction> successTransactions = new HashSet<Transaction>();
@@ -204,24 +208,13 @@ public class TestBank {
 			}
 		}
 
-		// System.out.println("Number of success transactions (single thread): " +
-		// successTransactions.size());
 		return calculateScore(bank, accList, successTransactions, totalScore);
 	}
 
 	static double multiThreadTest(ArrayList<Account> accList, ArrayList<Transaction> transactions, double totalScore) {
 		ConcreteBank bank = new ConcreteBank();
 		for (Account acc : accList) {
-			boolean addRes = bank.addAccount(acc.getAccountID(), acc.getBalance());
-			if (!addRes) {
-				System.out.println("Adding account fails!");
-				return 0.0;
-			}
-
-			if (!bank.getBalance(acc.getAccountID()).equals(acc.getBalance())) {
-				System.out.println("Initing account balance fails!");
-				return 0.0;
-			}
+			bank.addAccount(acc.getAccountID(), acc.getBalance());
 		}
 
 		ArrayList<Thread> threads = new ArrayList<Thread>();
@@ -234,15 +227,7 @@ public class TestBank {
 			Thread t;
 			if (op.equals("deposit")) {
 				t = new Thread(() -> {
-					try {
-						Thread.sleep(generateRandomInteger(10, 50));
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
 					boolean success = bank.deposit(transaction.accID1, transaction.amount);
-
 					synchronized (successTransactions) {
 						if (success) {
 							successTransactions.add(transaction);
@@ -252,13 +237,6 @@ public class TestBank {
 				});
 			} else if (op.equals("withdraw")) {
 				t = new Thread(() -> {
-					try {
-						Thread.sleep(generateRandomInteger(10, 50));
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
 					boolean success = bank.withdraw(transaction.accID1, transaction.amount, 20);
 					synchronized (successTransactions) {
 						if (success) {
@@ -270,13 +248,6 @@ public class TestBank {
 			} else {
 				assert (op.equals("transfer"));
 				t = new Thread(() -> {
-					try {
-						Thread.sleep(generateRandomInteger(10, 50));
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
 					boolean success = bank.transfer(transaction.accID1, transaction.accID2, transaction.amount, 20);
 					synchronized (successTransactions) {
 						if (success) {
@@ -303,8 +274,6 @@ public class TestBank {
 			}
 		}
 
-		// System.out.println("Number of success transactions (multi thread): " +
-		// successTransactions.size());
 		return calculateScore(bank, accList, successTransactions, totalScore);
 	}
 
@@ -313,7 +282,6 @@ public class TestBank {
 		for (String acc : accList) {
 			balanceMap.put(acc, bank.getBalance(acc));
 		}
-		System.out.println("balanceMap inited!");
 
 		long startTime = System.currentTimeMillis();
 		bank.doLottery(accList, (acc) -> {
@@ -410,18 +378,14 @@ public class TestBank {
 
 		synchronized (minedMap) {
 			minedMap.put(accName, bonus);
-			if (!minedMap.containsKey(accName)) {
-				System.out.println("minedMap put failed!");
-			}
 		}
 
 		return bonus;
 	}
 
 	static void test() {
-		int numAccount = 10;
-		ArrayList<Account> accList = getAccountList(numAccount);
-		ArrayList<Transaction> transactions = getTransactionList(10 * numAccount, accList);
+		ArrayList<Account> accList = getAccountList(200);
+		ArrayList<Transaction> transactions = getTransactionList(50, accList);
 
 		System.out.println("Begin single thread test ...");
 		double score1 = singleThreadTest(accList, transactions, 30.0);
@@ -437,7 +401,7 @@ public class TestBank {
 		}
 
 		ArrayList<String> accNameList = new ArrayList<String>();
-		for (int i = 0; i < numAccount; ++i) {
+		for (int i = 0; i < 10; ++i) {
 			accNameList.add(accList.get(i).getAccountID());
 		}
 
