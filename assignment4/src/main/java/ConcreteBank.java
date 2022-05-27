@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -27,23 +25,7 @@ public class ConcreteBank implements Bank {
     // private Map<String, Integer> accountsMapByID = new ConcurrentHashMap<>();
     private Map<String, Lock> locksMapByID = new HashMap<>();
     // private Map<String, Lock> locksMapByID = new ConcurrentHashMap<>();
-    // private Map<String, ReadWriteLock> locksMapByID = new HashMap<>();
-
-    // REVIEW
-    class TaskForMiner implements Runnable {
-        private String accountID;
-        private Miner miner;
-
-        public TaskForMiner(String accountID, Miner miner) {
-            this.accountID = accountID;
-            this.miner = miner;
-        }
-
-        @Override
-        public void run() {
-            deposit(this.accountID, this.miner.mine(this.accountID));
-        }
-    }
+    private Map<String, ReadWriteLock> RWLocksMapByID = new HashMap<>();
 
     @Override
     public boolean addAccount(String accountID, Integer initBalance) {
@@ -55,6 +37,7 @@ public class ConcreteBank implements Bank {
 
             accountsMapByID.put(accountID, initBalance);
             locksMapByID.put(accountID, new ReentrantLock());
+            RWLocksMapByID.put(accountID, new ReentrantReadWriteLock());
             return true;
         }
     }
@@ -66,13 +49,26 @@ public class ConcreteBank implements Bank {
             return false;
         }
 
-        Lock wLock = locksMapByID.get(accountID);
+        // final Lock wLock = locksMapByID.get(accountID);
+        final Lock wLock = RWLocksMapByID.get(accountID).writeLock();
+        final Condition cond = wLock.newCondition();
 
-        synchronized (wLock) {
+        // synchronized (wLock) {
+        // Integer newBalance = accountsMapByID.get(accountID) + amount;
+        // accountsMapByID.replace(accountID, newBalance);
+        // wLock.notifyAll();
+        // return true;
+        // }
+
+        wLock.lock();
+        try {
             Integer newBalance = accountsMapByID.get(accountID) + amount;
             accountsMapByID.replace(accountID, newBalance);
-            wLock.notifyAll();
+            cond.signalAll();
             return true;
+
+        } finally {
+            wLock.unlock();
         }
     }
 
@@ -83,18 +79,46 @@ public class ConcreteBank implements Bank {
             return false;
         }
 
-        Lock wLock = locksMapByID.get(accountID);
+        // final Lock wLock = locksMapByID.get(accountID);
+        final Lock wLock = RWLocksMapByID.get(accountID).writeLock();
+        final Condition cond = wLock.newCondition();
 
-        synchronized (wLock) {
+        // synchronized (wLock) {
+        // Integer currBalance = accountsMapByID.get(accountID);
+        // if (currBalance < amount) {
+        // // wait for some time
+        // try {
+        // wLock.wait(timeoutMillis);
+        // } catch (InterruptedException e) {
+        // e.printStackTrace();
+        // }
+
+        // // update currBalance
+        // currBalance = accountsMapByID.get(accountID);
+        // }
+
+        // if (currBalance >= amount) {
+        // Integer newBalance = currBalance - amount;
+        // accountsMapByID.replace(accountID, newBalance);
+        // wLock.notifyAll();
+        // return true;
+
+        // } else {
+        // wLock.notifyAll();
+        // return false;
+        // }
+        // }
+
+        wLock.lock();
+        try {
             Integer currBalance = accountsMapByID.get(accountID);
             if (currBalance < amount) {
                 // wait for some time
                 try {
-                    wLock.wait(timeoutMillis);
+                    cond.await(timeoutMillis, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
                 // update currBalance
                 currBalance = accountsMapByID.get(accountID);
             }
@@ -102,13 +126,16 @@ public class ConcreteBank implements Bank {
             if (currBalance >= amount) {
                 Integer newBalance = currBalance - amount;
                 accountsMapByID.replace(accountID, newBalance);
-                wLock.notifyAll();
+                cond.signalAll();
                 return true;
 
             } else {
-                wLock.notifyAll();
+                cond.signalAll();
                 return false;
             }
+
+        } finally {
+            wLock.unlock();
         }
     }
 
@@ -133,40 +160,71 @@ public class ConcreteBank implements Bank {
     @Override
     public Integer getBalance(String accountID) {
         // REVIEW
-        Integer currBalance = 0;
         if (!accountsMapByID.containsKey(accountID)) {
+            return 0;
+        }
+
+        // final Lock rLock = locksMapByID.get(accountID);
+        final Lock rLock = RWLocksMapByID.get(accountID).readLock();
+        // !!! readLock does not support condition
+        // final Condition cond = rLock.newCondition();
+
+        // synchronized (rLock) {
+        // Integer currBalance = accountsMapByID.get(accountID);
+        // rLock.notifyAll();
+        // return currBalance;
+        // }
+
+        rLock.lock();
+        try {
+            Integer currBalance = accountsMapByID.get(accountID);
+            // cond.signalAll();
             return currBalance;
+
+        } finally {
+            rLock.unlock();
         }
 
-        Lock rLock = locksMapByID.get(accountID);
+    }
 
-        synchronized (rLock) {
-            currBalance = accountsMapByID.get(accountID);
-            rLock.notifyAll();
+    // ???
+    class TaskForMiner implements Runnable {
+        final private String accountID;
+        final private Miner miner;
+
+        public TaskForMiner(String accountID, Miner miner) {
+            this.accountID = accountID;
+            this.miner = miner;
         }
 
-        return currBalance;
+        @Override
+        public void run() {
+            deposit(this.accountID, this.miner.mine(this.accountID));
+        }
     }
 
     @Override
     public void doLottery(ArrayList<String> accounts, Miner miner) {
         // REVIEW
+        // ??? why this does not work
         // int numAccounts = accounts.size();
         // ExecutorService es = Executors.newFixedThreadPool(numAccounts);
 
         // for (String accountID : accounts) {
-        //     es.submit(new Thread(() -> {
-        //         deposit(accountID, miner.mine(accountID));
-        //     }));
+        // es.submit(() -> {
+        // deposit(accountID, miner.mine(accountID));
+        // });
         // }
 
         // es.shutdown();
 
         List<Thread> threads = new ArrayList<>();
         for (String accountID : accounts) {
-            threads.add(new Thread(() -> {
+            Thread t = new Thread(() -> {
                 deposit(accountID, miner.mine(accountID));
-            }));
+            });
+            t.setName(accountID + "_miner");
+            threads.add(t);
         }
 
         for (Thread thread : threads) {
