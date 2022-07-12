@@ -31,13 +31,13 @@ public class ConcreteBank implements Bank {
     public boolean addAccount(String accountID, Integer initBalance) {
         // REVIEW
         synchronized (this) {
-            if (accountsMapByID.containsKey(accountID)) {
+            if (this.accountsMapByID.containsKey(accountID)) {
                 return false;
             }
 
-            accountsMapByID.put(accountID, initBalance);
-            locksMapByID.put(accountID, new ReentrantLock());
-            RWLocksMapByID.put(accountID, new ReentrantReadWriteLock());
+            this.accountsMapByID.put(accountID, initBalance);
+            this.locksMapByID.put(accountID, new ReentrantLock());
+            this.RWLocksMapByID.put(accountID, new ReentrantReadWriteLock());
             return true;
         }
     }
@@ -45,12 +45,12 @@ public class ConcreteBank implements Bank {
     @Override
     public boolean deposit(String accountID, Integer amount) {
         // REVIEW
-        if (!accountsMapByID.containsKey(accountID)) {
+        if (!this.accountsMapByID.containsKey(accountID)) {
             return false;
         }
 
         // final Lock wLock = locksMapByID.get(accountID);
-        final Lock wLock = RWLocksMapByID.get(accountID).writeLock();
+        final Lock wLock = this.RWLocksMapByID.get(accountID).writeLock();
         final Condition cond = wLock.newCondition();
 
         // synchronized (wLock) {
@@ -62,8 +62,8 @@ public class ConcreteBank implements Bank {
 
         wLock.lock();
         try {
-            Integer newBalance = accountsMapByID.get(accountID) + amount;
-            accountsMapByID.replace(accountID, newBalance);
+            Integer newBalance = this.accountsMapByID.get(accountID) + amount;
+            this.accountsMapByID.replace(accountID, newBalance);
             cond.signalAll();
             return true;
 
@@ -75,12 +75,12 @@ public class ConcreteBank implements Bank {
     @Override
     public boolean withdraw(String accountID, Integer amount, long timeoutMillis) {
         // REVIEW
-        if (!accountsMapByID.containsKey(accountID)) {
+        if (!this.accountsMapByID.containsKey(accountID)) {
             return false;
         }
 
         // final Lock wLock = locksMapByID.get(accountID);
-        final Lock wLock = RWLocksMapByID.get(accountID).writeLock();
+        final Lock wLock = this.RWLocksMapByID.get(accountID).writeLock();
         final Condition cond = wLock.newCondition();
 
         // synchronized (wLock) {
@@ -111,7 +111,7 @@ public class ConcreteBank implements Bank {
 
         wLock.lock();
         try {
-            Integer currBalance = accountsMapByID.get(accountID);
+            Integer currBalance = this.accountsMapByID.get(accountID);
             if (currBalance < amount) {
                 // wait for some time
                 try {
@@ -120,12 +120,12 @@ public class ConcreteBank implements Bank {
                     e.printStackTrace();
                 }
                 // update currBalance
-                currBalance = accountsMapByID.get(accountID);
+                currBalance = this.accountsMapByID.get(accountID);
             }
 
             if (currBalance >= amount) {
                 Integer newBalance = currBalance - amount;
-                accountsMapByID.replace(accountID, newBalance);
+                this.accountsMapByID.replace(accountID, newBalance);
                 cond.signalAll();
                 return true;
 
@@ -160,12 +160,12 @@ public class ConcreteBank implements Bank {
     @Override
     public Integer getBalance(String accountID) {
         // REVIEW
-        if (!accountsMapByID.containsKey(accountID)) {
+        if (!this.accountsMapByID.containsKey(accountID)) {
             return 0;
         }
 
         // final Lock rLock = locksMapByID.get(accountID);
-        final Lock rLock = RWLocksMapByID.get(accountID).readLock();
+        final Lock rLock = this.RWLocksMapByID.get(accountID).readLock();
         // !!! readLock does not support condition
         // final Condition cond = rLock.newCondition();
 
@@ -177,7 +177,7 @@ public class ConcreteBank implements Bank {
 
         rLock.lock();
         try {
-            Integer currBalance = accountsMapByID.get(accountID);
+            Integer currBalance = this.accountsMapByID.get(accountID);
             // cond.signalAll();
             return currBalance;
 
